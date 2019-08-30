@@ -1,10 +1,11 @@
-﻿CREATE VIEW dbo.OverviewEnvironmentMetadata
+﻿
+CREATE VIEW [dbo].[OverviewEnvironmentMetadata]
 AS
 SELECT col.ColumnID,
        col.Name AS ColumnName,
        tab.TableID,
        tab.Name AS TableName,
-       tab.Type,
+       tab.Type AS TableType,
        sch.SchemaID,
        sch.Name AS SchemaName,
        dat.DatabaseID,
