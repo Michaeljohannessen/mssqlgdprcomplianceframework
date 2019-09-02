@@ -1,4 +1,4 @@
-﻿CREATE   PROCEDURE [dbo].[CleanEventLog]
+﻿CREATE PROCEDURE dbo.CleanEventLog
 AS
 
 /* start logging */
@@ -38,7 +38,7 @@ BEGIN CATCH
 
     /* end logging with error */
     UPDATE [dbo].[EventLog]
-    SET [Description] = 'The following error was raised during the execution: ' + ERROR_MESSAGE(),
+    SET [Description] = [Description] + ' - The following error was raised during the execution: ' + ERROR_MESSAGE(),
         [Finished] = GETDATE(),
         [Status] = 'Finished with error'
     WHERE EventLogID = @CurrentEventLogID;

@@ -69,12 +69,15 @@
     <Build Include="dbo\Tables\EventLog.sql" />
     <Build Include="dbo\Tables\Database.sql" />
     <Build Include="dbo\Tables\Column.sql" />
-    <Build Include="dbo\Views\OverviewEnvironmentMetadata.sql" />
     <Build Include="dbo\Stored Procedures\SynchronizeEnvironmentMetadata.sql" />
     <Build Include="dbo\Stored Procedures\CleanEventLog.sql" />
     <Build Include="dbo\Tables\ExecutionRuleType.sql" />
     <Build Include="dbo\Stored Procedures\LoadDefaultSetupAndSettings.sql" />
     <Build Include="dbo\Stored Procedures\ExecuteSpecificExecutionRule.sql" />
     <Build Include="dbo\Stored Procedures\ExecuteAllExecutionRules.sql" />
+    <Build Include="dbo\Views\ViewSettings.sql" />
+    <Build Include="dbo\Views\ViewExecutionRules.sql" />
+    <Build Include="dbo\Views\ViewEventLogs.sql" />
+    <Build Include="dbo\Views\ViewEnvironmentMetadata.sql" />
   </ItemGroup>
 </Project>

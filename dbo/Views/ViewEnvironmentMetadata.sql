@@ -1,5 +1,4 @@
-﻿
-CREATE VIEW [dbo].[OverviewEnvironmentMetadata]
+﻿CREATE VIEW dbo.[ViewEnvironmentMetadata]
 AS
 SELECT col.ColumnID,
        col.Name AS ColumnName,
