@@ -21,48 +21,60 @@ BEGIN
     BEGIN TRY
 
         /* declaring variables related to stored procedure */
-        DECLARE @BuildQuery NVARCHAR(MAX);
+        DECLARE @BuiltQuery NVARCHAR(MAX);
 
         /* declaring variables related to execution rule */
-        DECLARE @DatabaseID INT;
-        DECLARE @DatabaseName NVARCHAR(255);
         DECLARE @ExecutionName NVARCHAR(255);
         DECLARE @ExecutionDefinition NVARCHAR(MAX);
         DECLARE @ExecutionRuleType NVARCHAR(255);
+        DECLARE @DatabaseName NVARCHAR(255);
+        DECLARE @SchemaName NVARCHAR(255);
+        DECLARE @TableID INT;
+        DECLARE @TableName NVARCHAR(255);
 
         /* getting definition of execution rule */
-        SELECT @DatabaseID = ExecutionRule.DatabaseID,
-               @ExecutionName = ExecutionRule.Name,
+        SELECT @ExecutionName = ExecutionRule.Name,
                @ExecutionDefinition = ExecutionRule.Definition,
-               @ExecutionRuleType = ExecutionRuleType.Name
+               @ExecutionRuleType = ExecutionRuleType.Name,
+               @TableID = ExecutionRule.TableID
         FROM dbo.ExecutionRule ExecutionRule
             INNER JOIN dbo.ExecutionRuleType ExecutionRuleType
                 ON ExecutionRuleType.ExecutionRuleTypeID = ExecutionRule.ExecutionRuleTypeID
         WHERE ExecutionRule.ExecutionRuleID = @ExecutionRuleID
               AND ExecutionRule.Enabled = 1;
 
-        SELECT @DatabaseName = DatabaseName
+        /* getting meta data information regarding selected execution rule */
+        SELECT DISTINCT
+               @TableName = TableName,
+               @SchemaName = SchemaName,
+               @DatabaseName = DatabaseName
         FROM dbo.ViewEnvironmentMetadata
-        WHERE DatabaseID = @DatabaseID;
+        WHERE TableID = @TableID;
 
-        /* build up query depending on type of execution rule */
-        IF (@ExecutionRuleType = 'Raw SQL Query')
+        /* build up query for type of user defined query */
+        IF (@ExecutionRuleType = 'User Defined Query')
         BEGIN
-            SET @BuildQuery = N'USE [' + @DatabaseName + N']; ' + @ExecutionDefinition;
+            SET @BuiltQuery = N'USE [' + @DatabaseName + N']; ' + @ExecutionDefinition;
         END;
 
-        IF (@ExecutionRuleType = '222')
+        /* build up query for type of where clause */
+        IF (@ExecutionRuleType = 'Where Clause')
         BEGIN
-            SET @BuildQuery = N'USE [' + @DatabaseName + N']; ' + @ExecutionDefinition;
+            SET @ExecutionDefinition = TRIM(@ExecutionDefinition);
+
+            /* if user did not put 'where' in front of the definition */
+            IF (UPPER(SUBSTRING(@ExecutionDefinition, 1, 5)) != 'WHERE')
+            BEGIN
+                SET @ExecutionDefinition = N' WHERE ' + @ExecutionDefinition;
+            END;
+
+            SET @BuiltQuery
+                = N'USE [' + @DatabaseName + N']; DELETE FROM [' + @SchemaName + N'].[' + @TableName + N'] '
+                  + @ExecutionDefinition;
         END;
 
-        IF (@ExecutionRuleType = '333')
-        BEGIN
-            SET @BuildQuery = N'USE [' + @DatabaseName + N']; ' + @ExecutionDefinition;
-        END;
-
-        /* executing the cleanup procedure */
-        EXEC (@BuildQuery);
+        /* executing the built query */
+        EXEC (@BuiltQuery);
 
         /* end logging */
         UPDATE [dbo].[EventLog]
@@ -80,5 +92,4 @@ BEGIN
             [Status] = 'Finished with error'
         WHERE EventLogID = @CurrentEventLogID;
     END CATCH;
-
 END;

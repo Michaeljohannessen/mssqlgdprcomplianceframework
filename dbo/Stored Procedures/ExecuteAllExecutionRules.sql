@@ -25,7 +25,8 @@ BEGIN
         DECLARE ExecutionRulesCursor CURSOR FOR
         SELECT ExecutionRuleID
         FROM [dbo].[ExecutionRule]
-        WHERE [Enabled] = 1;
+        WHERE [Enabled] = 1
+		ORDER BY ExecutionRuleID;
 
         -- iterate over elements in cursor
         OPEN ExecutionRulesCursor;

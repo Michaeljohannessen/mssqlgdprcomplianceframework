@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[LoadDefaultSetupAndSettings]
+﻿CREATE PROCEDURE dbo.LoadDefaultSetupAndSettings
 AS
 
 /* start logging */
@@ -49,8 +49,11 @@ BEGIN TRY;
 
     /* default values in ExecutionType */
     WITH DefaultExecutionRuleTypes
-    AS (SELECT N'Raw SQL Query' AS [Name],
-               N'Raw SQL Query Defined by User' AS [Description])
+    AS (SELECT N'User Defined Query' AS [Name],
+               N'User Defined SQL Query Defined by User' AS [Description]
+        UNION
+        SELECT N'Where Clause' AS [Name],
+               N'Simple Where Clause Defined by User' AS [Description])
 
     /* set settings to default values using merge */
     MERGE dbo.ExecutionRuleType tgt
