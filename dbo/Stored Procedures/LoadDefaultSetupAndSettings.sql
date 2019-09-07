@@ -47,7 +47,7 @@ BEGIN TRY;
     WHEN NOT MATCHED BY SOURCE THEN
         DELETE;
 
-    /* default values in ExecutionType */
+    /* default execution rule types values */
     WITH DefaultExecutionRuleTypes
     AS (SELECT N'User Defined Query' AS [Name],
                N'User Defined SQL Query Defined by User' AS [Description]

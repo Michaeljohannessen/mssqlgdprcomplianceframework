@@ -20,11 +20,13 @@ BEGIN TRY
 
     DECLARE @EventLogRetentionPeriod INT;
 
+    /* load settings from setting table */
     SELECT TOP (1)
            @EventLogRetentionPeriod = CAST([Value] AS INT)
     FROM [dbo].[Setting]
     WHERE [Name] = 'EventLogRetentionPeriod';
 
+    /* cleanup the eventlog */
     DELETE FROM dbo.EventLog
     WHERE Started < DATEADD(DAY, @EventLogRetentionPeriod * -1, GETDATE());
 

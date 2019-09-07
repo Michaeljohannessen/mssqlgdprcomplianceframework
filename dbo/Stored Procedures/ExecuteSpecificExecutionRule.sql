@@ -54,7 +54,7 @@ BEGIN
         /* build up query for type of user defined query */
         IF (@ExecutionRuleType = 'User Defined Query')
         BEGIN
-            SET @BuiltQuery = N'USE [' + @DatabaseName + N']; ' + @ExecutionDefinition;
+            SET @BuiltQuery = N'USE [' + @DatabaseName + N']; ' + @ExecutionDefinition + ';';
         END;
 
         /* build up query for type of where clause */
@@ -70,7 +70,7 @@ BEGIN
 
             SET @BuiltQuery
                 = N'USE [' + @DatabaseName + N']; DELETE FROM [' + @SchemaName + N'].[' + @TableName + N'] '
-                  + @ExecutionDefinition;
+                  + @ExecutionDefinition + ';';
         END;
 
         /* executing the built query */

@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[ExecuteAllExecutionRules]
+﻿CREATE PROCEDURE dbo.ExecuteAllExecutionRules
 AS
 BEGIN
 
@@ -21,14 +21,22 @@ BEGIN
 
         DECLARE @CurrentExecutionRuleID INT;
 
-        -- declaring cursor for execution rules
+        /* if cursor is declared we are removing it before starting to avoid exceptions */
+        IF CURSOR_STATUS('global', 'ExecutionRulesCursor') >= -1
+        BEGIN
+            CLOSE ExecutionRulesCursor;
+            DEALLOCATE ExecutionRulesCursor;
+        END;
+
+        /* declaring cursor for execution rules */
         DECLARE ExecutionRulesCursor CURSOR FOR
         SELECT ExecutionRuleID
         FROM [dbo].[ExecutionRule]
         WHERE [Enabled] = 1
-		ORDER BY ExecutionRuleID;
+        /* we might need to implement ordering according to RequiredExecutionRuleID */
+        ORDER BY ExecutionRuleID;
 
-        -- iterate over elements in cursor
+        /* iterate over elements in cursor */
         OPEN ExecutionRulesCursor;
         FETCH NEXT FROM ExecutionRulesCursor
         INTO @CurrentExecutionRuleID;
@@ -36,14 +44,14 @@ BEGIN
         WHILE @@FETCH_STATUS = 0
         BEGIN
 
-            -- call ExecuteSpecificExecutionRule for each active execution rule
+            /* call ExecuteSpecificExecutionRule for each active execution rule */
             EXEC [dbo].[ExecuteSpecificExecutionRule] @ExecutionRuleID = @CurrentExecutionRuleID;
 
             FETCH NEXT FROM ExecutionRulesCursor
             INTO @CurrentExecutionRuleID;
         END;
 
-        -- cleanup cursor
+        /* cleanup cursor */
         CLOSE ExecutionRulesCursor;
         DEALLOCATE ExecutionRulesCursor;
 
